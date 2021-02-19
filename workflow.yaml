@@ -6,8 +6,8 @@ main:
           - request_body : {
             "load": {
               "sourceUris": [
-                "${args.file_id}"
-              ],
+                "${ \"gs://\" + args.bucket + \"/\" + args.object}"
+                ],
               "destinationTable": {
                 "datasetId": "sample_dataset",
                 "projectId": "YOUR_PROJECT",
@@ -42,7 +42,19 @@ main:
         switch:
           - condition: ${"errorResult" in finalStatus.body.status }
             raise: ${finalStatus.body.status.errors}
-        next: returnResult
+
+    - tagSourceObject:
+        call: http.put
+        args:
+          url: "${\"https://storage.googleapis.com/storage/v1/b/\" + args.bucket + \"/o/\" + args.object }"
+          body:
+            metadata:
+              "status": "loaded"
+              "loadJobId": ${finalStatus.body.id}
+          headers:
+            Content-Type: "application/json"
+          auth:
+            type: OAuth2
 
     - returnResult:
         return:

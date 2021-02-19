@@ -14,7 +14,7 @@ def onNewFile(event, context):
     authed_session = AuthorizedSession(scoped_credentials)
 
     URL = 'https://workflowexecutions.googleapis.com/v1/projects/YOUR_PROJECT/locations/YOUR_REGION/workflows/sample-workflow/executions'
-    file_id_dict = {'file_id': 'gs://{}/{}'.format(event['bucket'], event['name'])}
+    file_id_dict = { 'bucket': '{}'.format(event['bucket']), 'object': '{}'.format(event['name']) }
     PARAMS = { 'argument' : json.dumps(file_id_dict) }
     response = authed_session.post(url=URL, json=PARAMS)
 
